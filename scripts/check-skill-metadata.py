@@ -5,6 +5,7 @@ Checks:
 - Valid YAML frontmatter
 - name present, lowercase kebab-case, and <= 64 chars
 - description present and <= 200 chars
+- intent present and non-empty
 - type present and one of: component, interactive, workflow
 - folder name matches frontmatter name
 - required sections exist in order:
@@ -100,6 +101,7 @@ def check_skill(path: str) -> list[Issue]:
 
     name = str(data.get("name") or "").strip()
     description = str(data.get("description") or "").strip()
+    intent = str(data.get("intent") or "").strip()
     skill_type = str(data.get("type") or "").strip()
 
     if not name:
@@ -113,6 +115,9 @@ def check_skill(path: str) -> list[Issue]:
         issues.append(Issue(path, "description_missing", "Frontmatter description is required"))
     elif len(description) > 200:
         issues.append(Issue(path, "description_too_long", f"{len(description)} chars"))
+
+    if not intent:
+        issues.append(Issue(path, "intent_missing", "Frontmatter intent is required"))
 
     if not skill_type:
         issues.append(Issue(path, "type_missing", "Frontmatter type is required"))

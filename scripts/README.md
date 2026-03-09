@@ -32,6 +32,12 @@ Use these exactly as written, then replace the example text in quotes.
 ./scripts/find-a-skill.sh --keyword onboarding
 ```
 
+### Find by trigger language and example situations
+
+```bash
+./scripts/find-a-skill.sh --mode trigger onboarding
+```
+
 ### Find a reusable workflow command
 
 ```bash
@@ -62,6 +68,12 @@ This prints a ready-to-use prompt. Great if you are using Claude or Codex in an 
 
 ```bash
 ./scripts/test-a-skill.sh --skill user-story --smoke
+```
+
+### Audit trigger wording before upload
+
+```bash
+python3 scripts/check-skill-triggers.py skills/user-story/SKILL.md --show-cases
 ```
 
 ### Validate the full library
@@ -195,10 +207,12 @@ If you want faster chaining into any chat UI:
 - `add-a-skill.sh`: Generate skills from notes or source content.
 - `build-a-skill.sh`: Guided wizard to create a skill step by step.
 - `find-a-skill.sh`: Search skills by keyword, name, or type.
+- `find-a-skill.sh --mode trigger`: Search using trigger-oriented frontmatter like `description`, `best_for`, and `scenarios`.
 - `find-a-command.sh`: Search workflow commands.
 - `run-pm.sh`: Turn skills/commands into prompts or run in Claude/Codex CLI.
 - `test-a-skill.sh`: Validate one skill's quality and structure.
 - `test-library.sh`: Validate skills, commands, and catalog output together.
+- `check-skill-triggers.py`: Audit description quality and sample trigger cases.
 - `zip-a-skill.sh`: Build upload-ready ZIP files for Claude web.
 - `package-claude-skills.sh`: Advanced packaging helper (unpacked format).
 - `check-skill-metadata.py`: Validate skill frontmatter and required sections.
@@ -224,6 +238,7 @@ If you want faster chaining into any chat UI:
 
 - These scripts are intended to be deterministic and local-first.
 - Read scripts before running if you are unsure, especially in shared environments.
+- Repo frontmatter includes `intent` for local authoring, but Claude upload packaging strips unsupported keys and keeps the trigger-oriented `description`.
 
 ## Related Docs
 

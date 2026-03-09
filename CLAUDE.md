@@ -4,9 +4,9 @@
 
 ---
 
-## Project Status (Last updated: Fri Feb 27 2026)
+## Project Status (Last updated: Mon Mar 9 2026)
 
-### Current State: v0.5 Released + Streamlit Beta in Flight + Multiple Active Phases
+### Current State: v0.7 Released + Metadata / Discovery Standards Tightened
 
 **Released: 46 Skills (Feb 27, 2026)**
 - 20 Component Skills (templates/artifacts + finance metrics + career frameworks)
@@ -51,6 +51,12 @@
   - See `docs/Finance Suite Summary.md` for complete overview
 
 **Recent Updates:**
+- ✅ **v0.7 Released (Mar 9, 2026):** Tightened skill quality and discovery standards across the full library
+  - Standardized trigger-oriented `description` language so skills more clearly answer "use this when..."
+  - Added repo-standard `intent` frontmatter to preserve richer meaning without weakening trigger metadata
+  - Added `scripts/check-skill-triggers.py` and wired trigger-readiness checks into `scripts/test-library.sh`
+  - Added `find-a-skill.sh --mode trigger` so skill discovery can leverage `description`, `best_for`, and `scenarios`
+  - Updated skill-authoring docs and templates so the stronger standard is maintained going forward
 - ✅ **v0.5 Streamlit (beta) update (Feb 27, 2026):** Added local playground, multi-provider model selection, and workflow UX fixes for phase-based skills (notably PRD flow behavior)
 - ✅ **v0.5 Released (Feb 27, 2026):** Added 4 Career & Leadership skills (Phase 8) distilled from The Product Porch podcast episodes on PM→Director and Director→VP/CPO transitions
 - ✅ **v0.4 Released (Feb 10, 2026):** Fixed facilitation protocol regression and standardized guided interaction behavior
@@ -109,7 +115,7 @@
 - Prefer evidence from local tools (`scripts/find-a-skill.sh`, `scripts/test-a-skill.sh`, `scripts/check-skill-metadata.py`) over subjective preference
 - Skills must follow standard anatomy: Purpose, Key Concepts, Application, Examples, Common Pitfalls, References
 - Interactive skills require 3-5 adaptive questions, enumerated options (3-5 choices), handle single/multi-selection
-- All skills include YAML frontmatter: `name`, `description`, `type`
+- All skills include YAML frontmatter: `name`, `description`, `intent`, `type`
 - Cross-reference related skills in References section
 - For Claude web custom skills: keep `name` <= 64 chars and `description` <= 200 chars, and ensure folder name matches `name`
 - Claude web uploads require `Skill.md` (case-sensitive); use `scripts/package-claude-skills.sh`

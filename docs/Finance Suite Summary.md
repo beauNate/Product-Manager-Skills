@@ -600,7 +600,7 @@ All skills pass metadata checks. ✅
 ```
 
 **Quality criteria met:**
-- ✅ YAML frontmatter valid (name, description, type)
+- ✅ YAML frontmatter valid (name, description, intent, type)
 - ✅ Names ≤64 chars (Claude web compatibility)
 - ✅ Descriptions ≤200 chars (Claude web compatibility)
 - ✅ Folder names match frontmatter names

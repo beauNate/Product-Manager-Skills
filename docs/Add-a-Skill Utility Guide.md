@@ -146,7 +146,8 @@ Files to create:
 
 YAML frontmatter:
   name: prioritization-framework-advisor
-  description: Guide PMs through feature prioritization using RICE framework with tradeoff analysis
+  description: Choose a prioritization framework. Use when deciding between RICE, ICE, or value/effort approaches.
+  intent: Guide PMs through feature prioritization using a structured framework with tradeoff analysis and context-sensitive recommendations.
   type: interactive
 
 Sections:
@@ -195,7 +196,13 @@ Generated files:
 - YAML frontmatter is valid
 - `name` field ≤ 64 characters
 - `description` field ≤ 200 characters
+- `intent` field is present for richer repo-facing meaning
 - `type` is one of: component, interactive, workflow
+
+Then run `scripts/check-skill-triggers.py` to catch weak descriptions before upload:
+- Description says what the skill does and when to use it
+- Description does not appear truncated at the 200-char limit
+- Frontmatter includes realistic scenarios or `best_for` hints for manual trigger checks
 
 **User action:** Review validation results, continue or exit
 
@@ -206,7 +213,13 @@ Validating: prioritization-framework-advisor
 ✓ YAML frontmatter is valid
 ✓ name: "prioritization-framework-advisor" (34 chars, ≤64) ✓
 ✓ description: "Guide PMs through feature..." (87 chars, ≤200) ✓
+✓ intent: present ✓
 ✓ type: "interactive" is valid ✓
+
+Trigger audit:
+✓ description includes a clear "Use when..." cue
+✓ scenarios provide realistic trigger examples
+✓ no truncation risk detected
 
 ✓ Passed validation
 

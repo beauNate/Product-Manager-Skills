@@ -57,6 +57,9 @@ Use these to speed up discovery and quality checks:
 
 # Test one skill with strict conformance + smoke checks
 ./scripts/test-a-skill.sh --skill your-skill-name --smoke
+
+# Audit trigger wording and sample test prompts
+python3 scripts/check-skill-triggers.py skills/your-skill-name/SKILL.md --show-cases
 ```
 
 ## What Counts As A Skill
@@ -96,7 +99,8 @@ Create a new folder in `skills/<skill-name>/SKILL.md` with lowercase kebab-case 
 ```markdown
 ---
 name: skill-name
-description: One-line description that includes when to use it (≤ 200 chars for Claude web uploads)
+description: What it does + when to use it in user language. Prefer "Use when..." and keep it ≤ 200 chars for Claude web uploads.
+intent: Longer repo-facing summary of the skill's purpose and why it exists.
 type: component
 ---
 
@@ -121,6 +125,8 @@ type: component
 - Define jargon on first use.
 - Make tradeoffs explicit.
 - If you plan to upload to Claude web custom skills, keep `name` <= 64 chars and `description` <= 200 chars.
+- Treat the description like trigger metadata, not marketing copy. It should say what the skill does and when Claude should load it.
+- Use `intent` for the richer repo-facing explanation. It should expand on the purpose without replacing the short trigger-oriented `description`.
 
 ## Optional Scripts (Deterministic Helpers)
 
@@ -141,6 +147,7 @@ Sample workflow frontmatter and structure:
 ---
 name: product-demo
 description: Plan and run product demos that land with the audience, avoid demo regret, and include rehearsal and contingency planning. Use when preparing a demo for stakeholders, customers, or executives.
+intent: Turn demo prep into a repeatable workflow that sharpens the story, reduces delivery risk, and keeps the audience's decision in view.
 type: workflow
 ---
 

@@ -4,9 +4,10 @@
 #
 # Runs:
 #   1) skill metadata checks
-#   2) command metadata/reference checks
-#   3) optional skill smoke tests
-#   4) catalog generation freshness check
+#   2) skill trigger-readiness audit
+#   3) command metadata/reference checks
+#   4) optional skill smoke tests
+#   5) catalog generation freshness check
 #
 
 set -euo pipefail
@@ -50,20 +51,23 @@ main() {
     parse_args "$@"
     cd "$PROJECT_ROOT"
 
-    echo "[1/4] Validating skills"
+    echo "[1/5] Validating skills"
     python3 "$SCRIPT_DIR/check-skill-metadata.py"
 
-    echo "[2/4] Validating commands"
+    echo "[2/5] Auditing trigger metadata"
+    python3 "$SCRIPT_DIR/check-skill-triggers.py"
+
+    echo "[3/5] Validating commands"
     python3 "$SCRIPT_DIR/check-command-metadata.py"
 
     if $RUN_SMOKE; then
-        echo "[3/4] Running skill smoke tests"
+        echo "[4/5] Running skill smoke tests"
         "$SCRIPT_DIR/test-a-skill.sh" --smoke
     else
-        echo "[3/4] Skipping smoke tests (use --smoke to enable)"
+        echo "[4/5] Skipping smoke tests (use --smoke to enable)"
     fi
 
-    echo "[4/4] Regenerating catalogs"
+    echo "[5/5] Regenerating catalogs"
     python3 "$SCRIPT_DIR/generate-catalog.py"
 
     echo "Library checks complete."

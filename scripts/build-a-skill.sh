@@ -36,6 +36,7 @@ OUTPUT_ROOT="$DEFAULT_OUTPUT_ROOT"
 # Collected skill data
 SKILL_NAME=""
 SKILL_DESCRIPTION=""
+SKILL_INTENT=""
 SKILL_TYPE=""
 SECTION_PURPOSE=""
 SECTION_KEY_CONCEPTS=""
@@ -105,6 +106,19 @@ read_required_line() {
         fi
         print_warning "This field is required."
     done
+}
+
+description_has_trigger_hint() {
+    local value="$1"
+    local normalized="${value,,}"
+    [[ "$normalized" == *"use when"* ]] || \
+    [[ "$normalized" == *"use for"* ]] || \
+    [[ "$normalized" == *"use this when"* ]] || \
+    [[ "$normalized" == *"use this to"* ]] || \
+    [[ "$normalized" == *"when user"* ]] || \
+    [[ "$normalized" == *"user says"* ]] || \
+    [[ "$normalized" == *"asks for"* ]] || \
+    [[ "$normalized" == *"mentions"* ]]
 }
 
 read_multiline_required() {
@@ -180,12 +194,17 @@ collect_frontmatter() {
     done
 
     while true; do
-        SKILL_DESCRIPTION="$(read_required_line "Description (<=200 chars)")"
+        SKILL_DESCRIPTION="$(read_required_line "Description (what it does + when to use it, <=200 chars)")"
         if [[ ${#SKILL_DESCRIPTION} -le 200 ]]; then
+            if ! description_has_trigger_hint "$SKILL_DESCRIPTION"; then
+                print_warning "Description should include a trigger cue like 'Use when...' so Claude knows when to load it."
+            fi
             break
         fi
         print_error "Description is ${#SKILL_DESCRIPTION} chars; must be <= 200."
     done
+
+    SKILL_INTENT="$(read_required_line "Intent (longer repo-facing summary of what this skill is fundamentally for)")"
 
     choose_skill_type
 
@@ -266,6 +285,7 @@ preview_summary() {
     echo "name:        $SKILL_NAME"
     echo "type:        $SKILL_TYPE"
     echo "description: $SKILL_DESCRIPTION"
+    echo "intent:      $SKILL_INTENT"
     echo "template.md: $INCLUDE_TEMPLATE"
     echo "examples:    ${#EXAMPLE_FILES[@]}"
     echo ""
@@ -286,6 +306,7 @@ write_skill_files() {
         echo "---"
         echo "name: $SKILL_NAME"
         echo "description: $SKILL_DESCRIPTION"
+        echo "intent: $SKILL_INTENT"
         echo "type: $SKILL_TYPE"
         echo "---"
         echo

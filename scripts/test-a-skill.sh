@@ -10,6 +10,7 @@
 #   --smoke:
 #     - Non-empty core sections
 #     - Interactive skills include numbered options in Application
+#     - Trigger-readiness audit via scripts/check-skill-triggers.py
 #
 # Usage:
 #   ./scripts/test-a-skill.sh
@@ -22,6 +23,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 VALIDATOR="$SCRIPT_DIR/check-skill-metadata.py"
+TRIGGER_AUDITOR="$SCRIPT_DIR/check-skill-triggers.py"
 
 RUN_SMOKE=false
 SKILL_ARGS=()
@@ -205,6 +207,15 @@ run_smoke_checks() {
             smoke_warn=$((smoke_warn + 1))
         fi
     fi
+
+    if python3 "$TRIGGER_AUDITOR" "$file" >/tmp/check-skill-triggers.$$ 2>&1; then
+        :
+    else
+        cat /tmp/check-skill-triggers.$$ | sed 's/^/    /'
+        echo "    FAIL smoke: trigger-readiness audit failed"
+        smoke_fail=$((smoke_fail + 1))
+    fi
+    rm -f /tmp/check-skill-triggers.$$
 
     WARN=$((WARN + smoke_warn))
     return "$smoke_fail"

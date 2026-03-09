@@ -16,6 +16,7 @@ SKILLS_GLOB = PROJECT_ROOT / "skills" / "*" / "SKILL.md"
 COMMANDS_GLOB = PROJECT_ROOT / "commands" / "*.md"
 
 SKILL_OPTIONAL_FIELDS = [
+    "intent",
     "domain",
     "job",
     "stage",

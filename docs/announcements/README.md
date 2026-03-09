@@ -4,6 +4,7 @@ Canonical location for launch posts, social copy, and release-related announceme
 
 ## Latest
 
+- **2026-03-09:** [v0.7 Sharper Skills, Faster Discovery](2026-03-09-v0-7-skill-quality-trigger-clarity.md)
 - **2026-03-08:** [v0.65 You Asked, We Listened](2026-03-08-v0-65-onboarding-integration-guides.md)
 - **2026-03-06:** [v0.6 Navigation + Commands](2026-03-06-v0-6-navigation-commands.md)
 - **2026-02-27:** [v0.5 Streamlit (beta) Playground](2026-02-27-v0-5-streamlit-beta.md)
@@ -13,6 +14,7 @@ Canonical location for launch posts, social copy, and release-related announceme
 
 ## Timeline
 
+- [2026-03-09-v0-7-skill-quality-trigger-clarity.md](2026-03-09-v0-7-skill-quality-trigger-clarity.md) — v0.7 release note for trigger-oriented metadata, `intent`, higher validation standards, and better skill discovery
 - [2026-03-08-v0-65-onboarding-integration-guides.md](2026-03-08-v0-65-onboarding-integration-guides.md) — v0.65 release note for comprehensive PM-first setup and integration guides across chat, CLI, automation, and agent frameworks
 - [2026-03-06-v0-6-navigation-commands.md](2026-03-06-v0-6-navigation-commands.md) — v0.6 release note for command workflows, quick-start onboarding, and generated catalogs
 - [2026-02-27-v0-5-streamlit-beta.md](2026-02-27-v0-5-streamlit-beta.md) — v0.5 Streamlit (beta) release note for local playground + workflow UX improvements

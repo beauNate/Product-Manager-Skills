@@ -25,6 +25,7 @@ NAME_FILTER=""
 KEYWORD_FILTER=""
 LIMIT=25
 LIST_ALL=false
+MODE="default"
 TEMP_FILE=""
 
 require_value() {
@@ -69,6 +70,50 @@ body_matches_keyword() {
     ' "$file" | grep -Fqi "$keyword"
 }
 
+extract_frontmatter_list() {
+    local file="$1"
+    local field="$2"
+
+    awk -v field="$field" '
+        BEGIN { in_frontmatter = 0; in_list = 0 }
+        NR == 1 && $0 == "---" { in_frontmatter = 1; next }
+        in_frontmatter && $0 == "---" { exit }
+        in_frontmatter {
+            if ($0 ~ "^" field ":[[:space:]]*$") {
+                in_list = 1
+                next
+            }
+            if (in_list && $0 ~ /^[A-Za-z0-9_-]+:[[:space:]]*/) {
+                exit
+            }
+            if (in_list && $0 ~ /^[[:space:]]*-[[:space:]]+/) {
+                sub(/^[[:space:]]*-[[:space:]]+/, "", $0)
+                sub(/^"/, "", $0)
+                sub(/"$/, "", $0)
+                print $0
+            }
+        }
+    ' "$file"
+}
+
+join_lines_inline() {
+    awk '
+        BEGIN { first = 1 }
+        NF {
+            if (!first) {
+                printf "; "
+            }
+            printf "%s", $0
+            first = 0
+        }
+        END {
+            if (!first) {
+                printf "\n"
+            }
+        }
+    '
+}
+
 print_help() {
     cat <<EOF
 Usage: $0 [OPTIONS] [QUERY]
@@ -79,12 +124,14 @@ Options:
   --name <text>        Filter by skill name (contains; exact name ranks highest)
   --type <type>        Filter by type: component, interactive, workflow
   --keyword <text>     Keyword to match/rank (name/description/body)
+  --mode <mode>        Search mode: default or trigger (default: default)
   --limit <n>          Max results (default: 25)
   --list-all           List all skills alphabetically
   --help, -h           Show this help
 
 Examples:
   $0 pricing
+  $0 --mode trigger onboarding
   $0 --type interactive --keyword roadmap
   $0 --name user-story
   $0 --list-all
@@ -111,6 +158,15 @@ parse_args() {
             --keyword)
                 require_value "--keyword" "${2:-}"
                 KEYWORD_FILTER="$2"
+                shift 2
+                ;;
+            --mode)
+                require_value "--mode" "${2:-}"
+                MODE="$(to_lower "$2")"
+                if [[ "$MODE" != "default" && "$MODE" != "trigger" ]]; then
+                    echo "Error: --mode must be default or trigger." >&2
+                    exit 1
+                fi
                 shift 2
                 ;;
             --limit)
@@ -156,12 +212,18 @@ main() {
             skill_name="$(extract_frontmatter_field "$skill_file" "name")"
             skill_type="$(extract_frontmatter_field "$skill_file" "type")"
             skill_desc="$(extract_frontmatter_field "$skill_file" "description")"
+            skill_best_for="$(extract_frontmatter_list "$skill_file" "best_for" | join_lines_inline)"
+            skill_scenarios="$(extract_frontmatter_list "$skill_file" "scenarios" | join_lines_inline)"
             if [[ -n "$TYPE_FILTER" && "$(to_lower "$skill_type")" != "$TYPE_FILTER" ]]; then
                 continue
             fi
-            echo "$skill_name|$skill_type|$skill_desc|${skill_file#$PROJECT_ROOT/}"
-        done | sort -t'|' -k1,1 | head -n "$LIMIT" | while IFS='|' read -r name type desc path; do
+            echo "$skill_name|$skill_type|$skill_desc|$skill_best_for|$skill_scenarios|${skill_file#$PROJECT_ROOT/}"
+        done | sort -t'|' -k1,1 | head -n "$LIMIT" | while IFS='|' read -r name type desc best_for scenarios path; do
             printf -- "- %s (%s) - %s\n  %s\n" "$name" "$type" "$desc" "$path"
+            if [[ "$MODE" == "trigger" ]]; then
+                [[ -n "$best_for" ]] && printf -- "  best_for=%s\n" "$best_for"
+                [[ -n "$scenarios" ]] && printf -- "  scenarios=%s\n" "$scenarios"
+            fi
         done
         exit 0
     fi
@@ -176,12 +238,16 @@ main() {
     for skill_file in $SKILLS_GLOB; do
         [[ -f "$skill_file" ]] || continue
 
-        local skill_name skill_desc skill_type skill_name_lc skill_desc_lc
+        local skill_name skill_desc skill_type skill_name_lc skill_desc_lc skill_best_for skill_scenarios skill_best_for_lc skill_scenarios_lc
         skill_name="$(extract_frontmatter_field "$skill_file" "name")"
         skill_desc="$(extract_frontmatter_field "$skill_file" "description")"
         skill_type="$(extract_frontmatter_field "$skill_file" "type")"
+        skill_best_for="$(extract_frontmatter_list "$skill_file" "best_for" | join_lines_inline)"
+        skill_scenarios="$(extract_frontmatter_list "$skill_file" "scenarios" | join_lines_inline)"
         skill_name_lc="$(to_lower "$skill_name")"
         skill_desc_lc="$(to_lower "$skill_desc")"
+        skill_best_for_lc="$(to_lower "$skill_best_for")"
+        skill_scenarios_lc="$(to_lower "$skill_scenarios")"
 
         if [[ -n "$TYPE_FILTER" && "$(to_lower "$skill_type")" != "$TYPE_FILTER" ]]; then
             continue
@@ -208,6 +274,9 @@ main() {
             if [[ "$skill_name_lc" == "$keyword_lc" ]]; then
                 score=$((score + 300))
                 reason="exact-name"
+            elif [[ "$MODE" == "trigger" && ( "$skill_desc_lc" == *"$keyword_lc"* || "$skill_best_for_lc" == *"$keyword_lc"* || "$skill_scenarios_lc" == *"$keyword_lc"* ) ]]; then
+                score=$((score + 220))
+                reason="trigger-frontmatter"
             elif [[ "$skill_name_lc" == *"$keyword_lc"* || "$skill_desc_lc" == *"$keyword_lc"* ]]; then
                 score=$((score + 200))
                 reason="frontmatter"
@@ -224,11 +293,13 @@ main() {
             reason="list"
         fi
 
-        printf "%s|%s|%s|%s|%s|%s\n" \
+        printf "%s|%s|%s|%s|%s|%s|%s|%s\n" \
             "$score" \
             "$skill_name" \
             "$skill_type" \
             "$skill_desc" \
+            "$skill_best_for" \
+            "$skill_scenarios" \
             "${skill_file#$PROJECT_ROOT/}" \
             "$reason" >> "$TEMP_FILE"
     done
@@ -238,8 +309,12 @@ main() {
         exit 1
     fi
 
-    sort -t'|' -k1,1nr -k2,2 "$TEMP_FILE" | head -n "$LIMIT" | while IFS='|' read -r score name type desc path reason; do
+    sort -t'|' -k1,1nr -k2,2 "$TEMP_FILE" | head -n "$LIMIT" | while IFS='|' read -r score name type desc best_for scenarios path reason; do
         printf -- "- %s (%s) - %s\n  %s\n  match=%s score=%s\n" "$name" "$type" "$desc" "$path" "$reason" "$score"
+        if [[ "$MODE" == "trigger" ]]; then
+            [[ -n "$best_for" ]] && printf -- "  best_for=%s\n" "$best_for"
+            [[ -n "$scenarios" ]] && printf -- "  scenarios=%s\n" "$scenarios"
+        fi
     done
 }
 

@@ -4,7 +4,7 @@
 ![GitHub stars](https://img.shields.io/github/stars/deanpeters/Product-Manager-Skills?style=flat-square)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey?style=flat-square)](https://github.com/deanpeters/Product-Manager-Skills/blob/main/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/deanpeters/Product-Manager-Skills/blob/main/CONTRIBUTING.md)
-[![Version](https://img.shields.io/badge/version-v0.65-blue?style=flat-square)](https://github.com/deanpeters/Product-Manager-Skills)
+[![Version](https://img.shields.io/badge/version-v0.7-blue?style=flat-square)](https://github.com/deanpeters/Product-Manager-Skills)
 ![Skills](https://img.shields.io/badge/skills-46-informational?style=flat-square)
 ![Commands](https://img.shields.io/badge/commands-6-informational?style=flat-square)
 ![Streamlit Beta](https://img.shields.io/badge/streamlit-beta-orange?style=flat-square)
@@ -22,7 +22,7 @@
 ║   46 battle-tested skills + 6 command workflows                    ║
 ║   Claude Code • Cursor • Codex  • n8n • OpenClaw • and more ...    ║
 ║                                                                    ║
-║   v0.65 • Mar 8, 2026 • CC BY-NC-SA 4.0                            ║
+║   v0.7 • Mar 9, 2026 • CC BY-NC-SA 4.0                             ║
 ╚════════════════════════════════════════════════════════════════════╝
 ```
 
@@ -33,6 +33,34 @@ Frame problems, hunt opportunities, scaffold validation experiments, and kill ba
 ---
 
 ## 📣 Updates & Announcements
+
+### Mar 9, 2026 — v0.7 Sharper Skills, Faster Discovery
+
+This release is about making the library easier to trust and easier to use.
+
+As this repo grows, the standard has to rise with it. So v0.7 focuses on the parts users actually feel:
+- finding the right skill faster,
+- understanding when to use it,
+- getting cleaner activation behavior,
+- and trusting that the repo is being actively tightened, not just expanded.
+
+What shipped:
+- Trigger-oriented description updates across the skill library so skills answer both "what it does" and "use this when..."
+- New `intent` frontmatter field so every skill can keep a sharp trigger description and a richer deeper-purpose summary
+- New trigger-readiness auditing in `scripts/check-skill-triggers.py`
+- Trigger checks wired into `scripts/test-library.sh`
+- New `find-a-skill.sh --mode trigger` for discovering skills by use-case language, `best_for`, and `scenarios`
+- Contributor docs updated so future skills follow the same tighter standard
+
+Why it matters:
+1. You spend less time guessing which skill to use.
+2. Skills are more likely to show up in the situations where you actually need them.
+3. The library becomes easier to navigate as it grows, not more chaotic.
+4. Quality becomes a maintained promise, not a one-time cleanup.
+
+Release note: [`docs/announcements/2026-03-09-v0-7-skill-quality-trigger-clarity.md`](docs/announcements/2026-03-09-v0-7-skill-quality-trigger-clarity.md)
+
+---
 
 ### Mar 8, 2026 — v0.65 You Asked, We Listened: Setup + Integration Everywhere
 
@@ -212,6 +240,7 @@ Before using any skill:
 - Review the skill file and any linked resources. If it includes `scripts/`, read them before running.
 - Prefer least privilege. Skills should not require secrets or network access unless explicitly documented.
 - Do a quick dry run with a realistic prompt, then refine `name` and `description` for better discoverability.
+- Run `python3 scripts/check-skill-triggers.py --show-cases` before packaging if you want a quick trigger-readiness pass.
 
 ---
 
@@ -235,6 +264,7 @@ Some skills include a `scripts/` folder with deterministic helpers for calculati
 - `scripts/find-a-command.sh` - Search commands by name/keyword/used skills.
 - `scripts/run-pm.sh` - Fast runner for either a skill or a command.
 - `scripts/test-a-skill.sh` - Run strict conformance checks and optional smoke checks.
+- `scripts/check-skill-triggers.py` - Audit frontmatter descriptions and scenario prompts for Claude-style triggering.
 - `scripts/test-library.sh` - Validate skills, commands, and regenerate catalogs.
 - `scripts/zip-a-skill.sh` - Build upload-ready `.zip` files by skill, type, or all skills.
 - `scripts/generate-catalog.py` - Regenerate skill/command navigation indexes.
@@ -303,6 +333,7 @@ pbpaste | ./scripts/add-a-skill.sh
 ## ✅ Claude Web Upload Checklist
 
 - Keep frontmatter `name` <= 64 chars and `description` <= 200 chars.
+- Use `intent` for the richer repo-facing explanation of the skill, while keeping `description` short and trigger-oriented.
 - Ensure the skill folder name matches the `name` value.
 - Use `scripts/zip-a-skill.sh --skill <skill-name>` (or `--type component`, `--preset core-pm`) to generate upload-ready ZIPs.
 - (Advanced) Use `scripts/package-claude-skills.sh` if you need unpacked upload-ready folders.
@@ -673,6 +704,15 @@ See [LICENSE](LICENSE) for full details.
 - **Productside:** [Learn more about AI PM consulting](https://productside.com)
 
 ---
+
+**v0.7 — March 9, 2026**
+
+Highlights in this release:
+- Tightened skill descriptions so they communicate both what the skill does and when to use it
+- Added `intent` as a repo-standard frontmatter field to separate trigger metadata from deeper purpose
+- Added `scripts/check-skill-triggers.py` and wired trigger-readiness auditing into `test-library.sh`
+- Added `find-a-skill.sh --mode trigger` so users can discover skills through `description`, `best_for`, and `scenarios`
+- Updated authoring docs and templates so the stronger metadata standard sticks
 
 **v0.65 — March 8, 2026**
 

@@ -180,7 +180,7 @@ The Claude Skills UI expects each uploaded skill to include a `Skill.md` file (c
    - Select a ZIP file from `dist/skill-zips/`
 4. **Enable the uploaded skill** and run a quick smoke test prompt.
 
-`zip-a-skill.sh` runs `package-claude-skills.sh` internally, strips unsupported upload frontmatter keys (for example `type`), then zips packaged folders for upload.
+`zip-a-skill.sh` runs `package-claude-skills.sh` internally, strips unsupported upload frontmatter keys (for example `type` and repo-only fields like `intent`), then zips packaged folders for upload.
 
 ### Advanced Option: MCP Integrations
 
