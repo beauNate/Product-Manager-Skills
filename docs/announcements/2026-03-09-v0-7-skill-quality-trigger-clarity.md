@@ -2,33 +2,37 @@
 
 ## Post Metadata
 
-- **Post Title:** Product Manager Skills v0.7 — Sharper Skill Triggering, Clearer Outcomes, Faster Discovery
-- **Post Subtitle:** We tightened the skill standard so the right skill is easier to find, easier to trust, and more likely to activate when you actually need it.
-- **Opening (first 160 chars):** v0.7 sharpens skill descriptions, adds richer intent metadata, improves discovery, and raises the quality bar so you get to the right PM workflow faster.
+- **Post Title:** Product Manager Skills v0.7 — Sharper Skill Triggering, Better Discovery, More Value on Day One
+- **Post Subtitle:** The right PM skill is now easier to find, easier to trust, and easier to run when you're in the middle of real work.
+- **Opening (first 160 chars):** v0.7 helps you find the right PM skill faster with clearer triggers, stronger metadata, and a simpler plain-English discovery flow.
 - **Primary Link:** [Product Manager Skills repo](https://github.com/deanpeters/Product-Manager-Skills)
 
 ---
 
 ## Short Promotional Post
 
-We are ceaselessly tuning this library so it stays useful, trustworthy, and up to standard as it grows.
+We are ceaselessly pushing this library to stay sharp as it grows.
 
-v0.7 is a quality release, but not the boring kind.
+v0.7 is about one thing:
 
-This update is about helping you get to the *right* skill faster, with less guesswork and less "why didn't that trigger?" friction.
+Helping you get to the *right* PM skill faster.
 
-What changed:
+## What's In It For You
+- Less hunting
+- Better activation
+- Easier trust
+- Friendlier discovery
+- Start from the problem, not the taxonomy
+
+## What Changed
 - Sharper, trigger-oriented skill descriptions across the library
 - New `intent` metadata so each skill can keep a clean trigger line *and* a richer repo-facing purpose
 - Stronger validation for metadata quality, not just file structure
 - Trigger-readiness audits built into the standard library checks
 - New trigger-oriented mode in `find-a-skill.sh` so discovery can use real usage cues, not just keywords
+- New Streamlit (beta) `Find My Skill` mode so you can describe what you're trying to do in plain English and get a recommended-first list of skills
 
-Why this matters to you:
-- You spend less time hunting for the right skill
-- Skills are more likely to activate in the right situations
-- The library is easier to trust because standards are explicit, not implied
-- Discovery gets friendlier as the repo grows, not noisier
+## Why We Made This Release
 
 Release: [Product Manager Skills v0.7](https://github.com/deanpeters/Product-Manager-Skills)
 
@@ -37,10 +41,10 @@ Release: [Product Manager Skills v0.7](https://github.com/deanpeters/Product-Man
 ## Long-Form Draft
 
 ### Title
-Product Manager Skills v0.7: Sharper Skill Triggering, Clearer Outcomes, Faster Discovery
+Product Manager Skills v0.7: Find the Right Skill Faster
 
 ### Subtitle
-How we tightened the skill standard so the library becomes easier to use as it matures, not harder
+Why better triggers and better discovery matter more than just adding more skills
 
 ### Article Body
 
@@ -55,13 +59,16 @@ Drift.
 Descriptions that explain what a skill is, but not when to use it.
 Great frameworks that are technically valid, but harder to discover.
 Metadata that works for maintainers, but not for real people trying to solve a real PM problem quickly.
+An app that can run skills, but still needs to do a better job helping someone answer the simplest question first:
+
+"Which skill should I use here?"
 
 v0.7 is about closing that gap.
 
 We are ceaselessly working to keep this repo up to standard, not just bigger.
 That matters because a 46-skill library only stays valuable if quality compounds alongside quantity.
 
-This release focuses on four things:
+This release focuses on five things:
 
 1. **Sharper trigger clarity**
    - We rewrote skill descriptions so they do a better job answering:
@@ -93,6 +100,14 @@ This release focuses on four things:
      - "I need a PRD"
      - "I need to test pricing"
 
+5. **A friendlier Streamlit path for real humans**
+   - We expanded the Streamlit (beta) app so it now separates `Learn`, `Find My Skill`, and `Run Skills`.
+   - The new `Find My Skill` mode lets someone describe a situation in plain English, get a recommended first match, understand why it fits, and then preview or run it immediately.
+   - That matters because most people do not start with a taxonomy. They start with a need:
+     - "Help me create a PRD"
+     - "I need to prioritize roadmap bets"
+     - "Activation is dropping and I need to know what to do next"
+
 What shipped in v0.7:
 - Trigger-oriented description cleanup across the skill library
 - New `intent` frontmatter field across all skills
@@ -100,12 +115,16 @@ What shipped in v0.7:
 - Updated `scripts/test-library.sh` to include trigger auditing
 - Updated skill-authoring docs and templates so future additions follow the tighter standard
 - New `find-a-skill.sh --mode trigger` for discovery by real-world use case language
+- Updated Streamlit (beta) app with `Learn`, `Find My Skill`, and `Run Skills` modes
+- Added recommended-first skill suggestions and clearer preview/run actions in the Streamlit finder
+- Cross-checked trigger improvements against Anthropic's [Complete Guide to Building Skills for Claude](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf)
 
 Why this matters to you:
 
 - **You find the right skill faster**
   - Less browsing by file name
   - More matching by use case and situation
+  - A simpler app path when you want to start from "what am I trying to do?"
 
 - **You get more reliable activation**
   - Skills are described in ways that are easier for agents to select correctly
@@ -124,3 +143,5 @@ This is the kind of release that pays off every time someone asks:
 "Which skill should I use here?"
 
 And gets a better answer, faster.
+
+That is the bar.

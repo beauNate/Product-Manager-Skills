@@ -44,20 +44,22 @@ As this repo grows, the standard has to rise with it. So v0.7 focuses on the par
 - getting cleaner activation behavior,
 - and trusting that the repo is being actively tightened, not just expanded.
 
-What shipped:
+#### Why it matters:
+1. You spend less time guessing which skill to use.
+2. Skills are more likely to show up in the situations where you actually need them.
+3. The library becomes easier to navigate as it grows, not more chaotic.
+4. Quality becomes a maintained promise, not a one-time cleanup.
+
+#### What shipped:
 - Trigger-oriented description updates across the skill library so skills answer both "what it does" and "use this when..."
 - New `intent` frontmatter field so every skill can keep a sharp trigger description and a richer deeper-purpose summary
 - New trigger-readiness auditing in `scripts/check-skill-triggers.py`
 - Trigger checks wired into `scripts/test-library.sh`
 - New `find-a-skill.sh --mode trigger` for discovering skills by use-case language, `best_for`, and `scenarios`
+- New Streamlit (beta) `Find My Skill` mode so users can describe a situation in plain English and get recommended skills with clear next actions
+- Streamlit navigation now separates `Learn`, `Find My Skill`, and `Run Skills` so first-time users can move from confusion to action faster
 - Contributor docs updated so future skills follow the same tighter standard
 - Cross-checked the tighter standard against Anthropic's [Complete Guide to Building Skills for Claude](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf)
-
-Why it matters:
-1. You spend less time guessing which skill to use.
-2. Skills are more likely to show up in the situations where you actually need them.
-3. The library becomes easier to navigate as it grows, not more chaotic.
-4. Quality becomes a maintained promise, not a one-time cleanup.
 
 Release note: [`docs/announcements/2026-03-09-v0-7-skill-quality-trigger-clarity.md`](docs/announcements/2026-03-09-v0-7-skill-quality-trigger-clarity.md)
 
@@ -230,6 +232,11 @@ Want a quick local test-drive before using skills in your agent workflow?
 pip install -r app/requirements.txt
 streamlit run app/main.py
 ```
+
+What you can do in v0.7:
+- `Learn` setup and integration paths without leaving the app
+- `Find My Skill` by describing your situation in plain English
+- `Run Skills` with your own scenario once you know what you want
 
 This beta interface is a feature in flight. Feedback is welcome via [GitHub Issues](https://github.com/deanpeters/Product-Manager-Skills/issues) or [LinkedIn](https://linkedin.com/in/deanpeters).
 
@@ -713,6 +720,7 @@ Highlights in this release:
 - Added `intent` as a repo-standard frontmatter field to separate trigger metadata from deeper purpose
 - Added `scripts/check-skill-triggers.py` and wired trigger-readiness auditing into `test-library.sh`
 - Added `find-a-skill.sh --mode trigger` so users can discover skills through `description`, `best_for`, and `scenarios`
+- Added a Streamlit (beta) `Find My Skill` mode with plain-English discovery, recommended-first results, and direct preview/run actions
 - Updated authoring docs and templates so the stronger metadata standard sticks
 
 **v0.65 — March 8, 2026**

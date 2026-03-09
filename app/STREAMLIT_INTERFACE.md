@@ -1,10 +1,13 @@
 # PM Skills Playground — Streamlit Interface (beta)
 
-A local web app for browsing and test-driving PM skills against available LLM APIs before committing to installing them in Claude Code, Cowork, or Codex.
+A local web app for **learning PM Skills setup/integration**, **finding the right skill for a situation**, and **test-driving PM skills** against available LLM APIs.
 
 **Status:** Streamlit (beta). This is a new feature in flight and we are actively testing and refining it. Feedback is welcome via [GitHub Issues](https://github.com/deanpeters/Product-Manager-Skills/issues) or [LinkedIn](https://linkedin.com/in/deanpeters).
 
-**Pedagogic goal:** Lower the barrier from "I've heard about this skill" to "I've seen it work in my context." Users pick a theme, read what they're getting into, then run the skill — with full multi-turn conversation for interactive skills, progress tracking, and an explicit bail path at every step.
+**Pedagogic goal:** Lower the barrier from "I've heard about this skill" to "I've seen it work in my context." The app now supports three paths:
+- **Learn** for setup and integration guidance
+- **Find My Skill** for situation-to-skill recommendation
+- **Run Skills** for worked examples and live testing
 
 ---
 
@@ -67,6 +70,7 @@ Parsed fields per skill:
 |-------|--------|----------|
 | `name` | frontmatter | yes |
 | `description` | frontmatter | yes |
+| `intent` | frontmatter | yes |
 | `type` | frontmatter | yes |
 | `theme` | frontmatter | optional |
 | `best_for` | frontmatter | optional |
@@ -76,31 +80,67 @@ Parsed fields per skill:
 | `purpose_short` | first paragraph of Purpose section | derived |
 | `has_examples` | presence of `examples/` subdir | derived |
 
-### Four Screens
+### Navigation Model
 
 ```
-Home (theme browser)
-  └─ Theme (skill cards)
-       └─ Skill Detail (preview + scenario input)
-            └─ Session (run the skill)
+Home (mode chooser)
+  ├─ Learn Hub (docs-driven onboarding and platform guides)
+  │    └─ Guide Detail (renders markdown guide files from docs/)
+  ├─ Find My Skill
+  │    └─ Ranked skill suggestions (situation → metadata-based matches)
+  └─ Run Skills (learning simulator)
+       ├─ Skill + Context Input
+       │    └─ Worked Example Output
+       │         ├─ Filled Template / Form
+       │         └─ Steps and Transformations
+       └─ Advanced Browser (optional)
+            └─ Theme (skill cards)
+                 └─ Skill Detail (preview + scenario input)
+                      └─ Session (run the skill)
 ```
 
-Navigation is state-based (`st.session_state.view`). The `nav()` helper handles all transitions and resets session state cleanly on each move.
+Navigation is state-based (`st.session_state.view`). The `nav()` helper handles transitions and resets session artifacts when switching contexts.
+
+### Find My Skill
+
+**What it does:**
+- Takes a plain-language description of the user's situation
+- Ranks matching skills using trigger-oriented metadata
+- Shows why a skill matched, plus `best_for` and `scenarios`
+- Sends users directly to preview or run a recommended skill
+
+**Ranking signals used:**
+- `name`
+- `description`
+- `best_for`
+- `scenarios`
+- `intent`
+- `purpose_short`
+
+This mode is intentionally aligned with the repo's stronger trigger metadata standard and the CLI's `find-a-skill.sh --mode trigger` behavior.
 
 ### Session Types
 
-**Component skills** (single-shot):
-- User enters scenario → one API call → artifact rendered as markdown
-- "Try a different scenario" returns to Skill Detail
+**Learning simulator** (default Run Skills flow):
+- User chooses a skill + context (preset or custom) and clicks **Run the Skill Steps**
+- One API call runs the selected skill end-to-end internally (no follow-up questioning)
+- Output is rendered as:
+  - **Filled Template / Form** (worked example artifact)
+  - **Steps and Transformations** (what changed at each step)
+  - **Assumptions Made** (explicit gaps the model filled)
 
-**Interactive skills** (multi-turn chat):
+**Advanced sessions** (optional manual mode):
+- Available under the "Need the older advanced browser?" expander in Run Skills
+- Preserves previous behavior for component, interactive, and workflow session testing
+
+**Interactive skills in advanced mode** (multi-turn chat):
 - Pre-flight info box shown before session starts (sets expectations, names the bail path)
 - First user message auto-sent on session start; Claude opens with the skill's Step 0
 - Progress indicator parses `Q1/3` / `Context Q2/3` / `Step N of M` patterns from assistant messages
 - `st.chat_input` for freeform responses; typing `done`, `bail`, `exit`, or `quit` ends the session gracefully
 - Sidebar always shows: **↩ Start over** · **← Different skill** · **🏠 Home**
 
-**Workflow skills** (phase-based):
+**Workflow skills in advanced mode** (phase-based):
 - Phase headings auto-detected from `### Phase N` patterns in the Application section
 - Phase radio selector lets users jump to any phase
 - Each phase: enter context → Run → output → Re-run or Continue to next phase
@@ -117,7 +157,17 @@ Navigation is state-based (`st.session_state.view`). The `nav()` helper handles 
 
 ### System Prompt
 
-Each session uses the full `SKILL.md` body as the system prompt, with a short facilitation addendum for interactive skills:
+The learning simulator uses the full `SKILL.md` body plus instructions to run the workflow internally without follow-up questions:
+
+```python
+def build_learning_simulator_system_prompt(skill):
+    # Full skill body + simulation instructions:
+    # - run end-to-end internally
+    # - no follow-up questions
+    # - include assumptions explicitly
+```
+
+Advanced sessions keep the existing behavior, including the interactive facilitation addendum:
 
 ```python
 def build_system_prompt(skill):
@@ -164,7 +214,7 @@ estimated_time: "10-15 min"
 | `ai-agents` | AI & Agents |
 | `workshops-facilitation` | Workshops & Facilitation |
 
-**Validation:** Adding these fields does not break `scripts/check-skill-metadata.py` — the validator only checks required fields (`name`, `description`, `type`) and ignores unknown keys.
+**Validation:** Adding these fields does not break `scripts/check-skill-metadata.py` as long as required fields are present. The validator now checks required fields (`name`, `description`, `intent`, `type`) and ignores other unknown keys.
 
 **Currently tagged:** 16 skills across all 7 themes (2 per theme minimum, 4 in Career & Leadership). Remaining 30 skills can be tagged in follow-on passes using the same frontmatter pattern.
 
@@ -172,11 +222,20 @@ estimated_time: "10-15 min"
 
 ## UX Design Decisions
 
-**Theme-first, not type-first.** Users come with a job to be done ("I'm preparing for a Director interview"), not a skill type ("I want an interactive skill"). Themes map to situations; type badges (🧱 🔄 🎭) set expectations about the interaction.
+**Mode-first for clarity.** The app now separates **Learn** (how to install/use/integrate), **Find My Skill** (discover the right skill from a situation), and **Run Skills** (execute skills with models). This reduces first-time confusion and keeps docs as source of truth.
 
-**Pre-flight for interactive and workflow skills.** Before starting a multi-turn session, the user sees what they're getting into: estimated time, what the conversation will produce, and where the bail controls are. Component skills go straight to the output — they're single-shot.
+**Context-first inside Run Skills.** Users now get the shortest path to learning output: pick a skill, add context, run once, and inspect both artifact and transformation path.
 
-**Bail is always visible.** During a session, the sidebar always shows Start over, Different skill, and Home. These reset state cleanly without losing the skill selection context. Typing `done` or `bail` in chat also exits gracefully.
+**Advanced mode stays available.** The older themed browser and manual session flows are still available when users want multi-turn interaction or phase-by-phase control.
+
+**Learning output structure is fixed.** The simulator asks for consistent sections so users always see:
+1. Filled Template/Form
+2. Steps and Transformations
+3. Assumptions Made
+
+**Learn + Practice in one flow.** The Learn hub includes starter “Run this skill” actions so onboarding and execution are connected, not separate products.
+
+**Situation-first discovery.** Users rarely think in skill names. The finder uses trigger-oriented metadata so people can describe the problem in normal language and still reach the right skill.
 
 **Progress from the skill itself.** Interactive skills built on the facilitation protocol already emit `Q1/3`-style progress labels. The app parses these rather than maintaining a separate step counter, so progress tracking is automatically correct as skills are updated.
 
@@ -220,6 +279,6 @@ The app can be deployed, but it uses environment-variable key loading only and s
 - **Streaming responses** for lower perceived latency
 - **Shared hosted key** option with session-level rate limiting for public demos
 - **Related skills panel** — surface cross-references from the skill's References section
-- **Export conversation** — download a session as markdown
+- **Export worked example** — download simulator output as markdown
 - **Theme metadata for remaining 30 skills** — follow-on tagging pass
-- **Search** — keyword search across skill names, descriptions, and best_for bullets
+- **Finder polish** — richer ranking explanations, recent searches, and saved recommendation paths
